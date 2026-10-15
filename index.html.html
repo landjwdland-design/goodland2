@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مصنع جود لاند للحاصلات الزراعية والفول السوداني</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; }
+        @media print { .no-print { display: none !important; } }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-red-700 text-white shadow-lg py-4 px-6 mb-6 no-print">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold flex items-center gap-2">
+                    🥜 مصنع جود لاند (Good Land) للحاصلات الزراعية والفول السوداني
+                </h1>
+                <p class="text-sm text-red-200 mt-1">سماكين الشرق - الحسينية - شرقية | إشراف: م. كريم عزت | تصميم: م. هاني داود</p>
+            </div>
+            <div class="mt-3 md:mt-0 bg-red-800 px-4 py-2 rounded-lg text-sm border border-red-600">
+                <span>⚡ نظام الإدارة وحفظ البيانات المحلي</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="container mx-auto px-4 mb-6 no-print">
+        <div class="flex flex-wrap gap-2 bg-white p-2 rounded-xl shadow-md border border-gray-200">
+            <button onclick="switchTab('buyers')" id="btn-buyers" class="tab-btn flex-1 min-w-[120px] py-2 px-3 rounded-lg font-bold text-center bg-red-700 text-white transition">🛒 المشترين</button>
+            <button onclick="switchTab('sellers')" id="btn-sellers" class="tab-btn flex-1 min-w-[120px] py-2 px-3 rounded-lg font-bold text-center bg-gray-200 text-gray-700 hover:bg-gray-300 transition">🌾 البائعين</button>
+            <button onclick="switchTab('buyer-statement')" id="btn-buyer-statement" class="tab-btn flex-1 min-w-[140px] py-2 px-3 rounded-lg font-bold text-center bg-gray-200 text-gray-700 hover:bg-gray-300 transition">📜 كشف حساب مشتري</button>
+            <button onclick="switchTab('seller-statement')" id="btn-seller-statement" class="tab-btn flex-1 min-w-[140px] py-2 px-3 rounded-lg font-bold text-center bg-gray-200 text-gray-700 hover:bg-gray-300 transition">📑 كشف حساب بائع</button>
+            <button onclick="switchTab('workers-sheet')" id="btn-workers-sheet" class="tab-btn flex-1 min-w-[140px] py-2 px-3 rounded-lg font-bold text-center bg-gray-200 text-gray-700 hover:bg-gray-300 transition">👷‍♂️ شيت العمال والرواتب</button>
+            <button onclick="switchTab('expenses')" id="btn-expenses" class="tab-btn flex-1 min-w-[120px] py-2 px-3 rounded-lg font-bold text-center bg-gray-200 text-gray-700 hover:bg-gray-300 transition">💸 المصاريف</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="container mx-auto px-4 pb-12">
+
+        <!-- 1. قسم المشترين -->
+        <div id="tab-buyers" class="tab-content">
+            <div class="bg-white rounded-xl shadow-md p-6 mb-6 border-t-4 border-red-700">
+                <h2 class="text-xl font-bold mb-4 text-red-700">تسجيل مبيعات لمشتري</h2>
+                <form id="buyerForm" onsubmit="addTransaction('buyer', event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">اسم المشتري:</label>
+                        <input type="text" id="bName" required class="w-full border rounded-lg p-2" placeholder="أحمد محمد...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">نوع المحصول:</label>
+                        <input type="text" id="bCrop" required class="w-full border rounded-lg p-2" placeholder="فول سوداني فاخر...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">الوزن (كيلو / طن):</label>
+                        <input type="number" step="0.01" id="bWeight" required oninput="calcTotal('b')" class="w-full border rounded-lg p-2" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">السعر:</label>
+                        <input type="number" step="0.01" id="bPrice" required oninput="calcTotal('b')" class="w-full border rounded-lg p-2" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">الإجمالي:</label>
+                        <input type="number" step="0.01" id="bTotal" readonly class="w-full border rounded-lg p-2 bg-gray-100 font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">المدفوع:</label>
+                        <input type="number" step="0.01" id="bPaid" required oninput="calcTotal('b')" class="w-full border rounded-lg p-2" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">المتبقي (عليه):</label>
+                        <input type="number" step="0.01" id="bRemaining" readonly class="w-full border rounded-lg p-2 bg-red-50 text-red-600 font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">التاريخ:</label>
+                        <input type="date" id="bDate" required class="w-full border rounded-lg p-2">
+                    </div>
+                    <div class="md:col-span-4 flex justify-end">
+                        <button type="submit" class="bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-6 rounded-lg">حفظ المبيعات</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- تسديد دفعة جديدة من مشتري -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-6 border-t-4 border-blue-600">
+                <h3 class="text-lg font-bold mb-3 text-blue-800">💵 تسديد دفعة/قسط من مشتري (خصم من الدين)</h3>
+                <form onsubmit="payInstallment('buyer', event)" class="flex flex-wrap gap-4 items-end">
+                    <div class="flex-1 min-w-[200px]">
+                        <label class="block text-sm font-semibold mb-1">اختر المشتري:</label>
+                        <select id="payBuyerSelect" required class="w-full border p-2 rounded-lg"></select>
+                    </div>
+                    <div class="w-48">
+                        <label class="block text-sm font-semibold mb-1">المبلغ المدفوع (جنية):</label>
+                        <input type="number" step="0.01" id="payBuyerAmount" required class="w-full border p-2 rounded-lg" placeholder="0.00">
+                    </div>
+                    <div class="w-48">
+                        <label class="block text-sm font-semibold mb-1">التاريخ:</label>
+                        <input type="date" id="payBuyerDate" required class="w-full border p-2 rounded-lg">
+                    </div>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2 rounded-lg">خصم وتسجيل الدفعة</button>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 overflow-x-auto">
+                <h3 class="text-lg font-bold mb-4">سجل المشترين</h3>
+                <table class="w-full text-right border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 border-b">
+                            <th class="p-3">اسم المشتري</th>
+                            <th class="p-3">المحصول</th>
+                            <th class="p-3">الوزن</th>
+                            <th class="p-3">السعر</th>
+                            <th class="p-3">الإجمالي</th>
+                            <th class="p-3">المدفوع</th>
+                            <th class="p-3">المتبقي</th>
+                            <th class="p-3">التاريخ</th>
+                            <th class="p-3">حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="buyersTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 2. قسم البائعين -->
+        <div id="tab-sellers" class="tab-content hidden">
+            <div class="bg-white rounded-xl shadow-md p-6 mb-6 border-t-4 border-green-700">
+                <h2 class="text-xl font-bold mb-4 text-green-700">تسجيل مشتريات من بائع</h2>
+                <form id="sellerForm" onsubmit="addTransaction('seller', event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">اسم البائع:</label>
+                        <input type="text" id="sName" required class="w-full border rounded-lg p-2" placeholder="المورد...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">نوع المحصول:</label>
+                        <input type="text" id="sCrop" required class="w-full border rounded-lg p-2" placeholder="فول سوداني خام...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">الوزن:</label>
+                        <input type="number" step="0.01" id="sWeight" required oninput="calcTotal('s')" class="w-full border rounded-lg p-2" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">السعر:</label>
+                        <input type="number" step="0.01" id="sPrice" required oninput="calcTotal('s')" class="w-full border rounded-lg p-2" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">الإجمالي:</label>
+                        <input type="number" step="0.01" id="sTotal" readonly class="w-full border rounded-lg p-2 bg-gray-100 font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">المدفوع له:</label>
+                        <input type="number" step="0.01" id="sPaid" required oninput="calcTotal('s')" class="w-full border rounded-lg p-2" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">المتبقي له:</label>
+                        <input type="number" step="0.01" id="sRemaining" readonly class="w-full border rounded-lg p-2 bg-green-50 text-green-600 font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">التاريخ:</label>
+                        <input type="date" id="sDate" required class="w-full border rounded-lg p-2">
+                    </div>
+                    <div class="md:col-span-4 flex justify-end">
+                        <button type="submit" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-6 rounded-lg">حفظ المشتريات</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- سداد دفعة لبائع -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-6 border-t-4 border-blue-600">
+                <h3 class="text-lg font-bold mb-3 text-blue-800">💵 سداد دفعة جديدة لبائع (خصم من مستحقاته)</h3>
+                <form onsubmit="payInstallment('seller', event)" class="flex flex-wrap gap-4 items-end">
+                    <div class="flex-1 min-w-[200px]">
+                        <label class="block text-sm font-semibold mb-1">اختر البائع:</label>
+                        <select id="paySellerSelect" required class="w-full border p-2 rounded-lg"></select>
+                    </div>
+                    <div class="w-48">
+                        <label class="block text-sm font-semibold mb-1">المبلغ المدفوع (جنية):</label>
+                        <input type="number" step="0.01" id="paySellerAmount" required class="w-full border p-2 rounded-lg" placeholder="0.00">
+                    </div>
+                    <div class="w-48">
+                        <label class="block text-sm font-semibold mb-1">التاريخ:</label>
+                        <input type="date" id="paySellerDate" required class="w-full border p-2 rounded-lg">
+                    </div>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2 rounded-lg">خصم وتسجيل الدفعة</button>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 overflow-x-auto">
+                <h3 class="text-lg font-bold mb-4">سجل البائعين</h3>
+                <table class="w-full text-right border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 border-b">
+                            <th class="p-3">اسم البائع</th>
+                            <th class="p-3">المحصول</th>
+                            <th class="p-3">الوزن</th>
+                            <th class="p-3">السعر</th>
+                            <th class="p-3">الإجمالي</th>
+                            <th class="p-3">المدفوع له</th>
+                            <th class="p-3">المتبقي له</th>
+                            <th class="p-3">التاريخ</th>
+                            <th class="p-3">حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sellersTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 3. كشف حساب مشتري -->
+        <div id="tab-buyer-statement" class="tab-content hidden">
+            <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4 text-red-700">كشف حساب مشتري مخصص</h2>
+                <div class="flex gap-4 mb-6 no-print">
+                    <select id="selectBuyer" onchange="renderBuyerStatement()" class="border p-2 rounded-lg flex-1">
+                        <option value="">اختر المشتري...</option>
+                    </select>
+                    <button onclick="window.print()" class="bg-gray-800 text-white px-4 py-2 rounded-lg">طباعة كشف الحساب</button>
+                </div>
+                <div id="buyerStatementArea">
+                    <p class="text-gray-500 text-center py-4">يرجى اختيار اسم المشتري لعرض كشف حسابه الخاص.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. كشف حساب بائع -->
+        <div id="tab-seller-statement" class="tab-content hidden">
+            <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4 text-green-700">كشف حساب بائع مخصص</h2>
+                <div class="flex gap-4 mb-6 no-print">
+                    <select id="selectSeller" onchange="renderSellerStatement()" class="border p-2 rounded-lg flex-1">
+                        <option value="">اختر البائع...</option>
+                    </select>
+                    <button onclick="window.print()" class="bg-gray-800 text-white px-4 py-2 rounded-lg">طباعة كشف الحساب</button>
+                </div>
+                <div id="sellerStatementArea">
+                    <p class="text-gray-500 text-center py-4">يرجى اختيار اسم البائع لعرض كشف حسابه الخاص.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. شيت العمال المجمع -->
+        <div id="tab-workers-sheet" class="tab-content hidden">
+            <div class="bg-white rounded-xl shadow-md p-6 mb-6 border-t-4 border-blue-700">
+                <h2 class="text-xl font-bold mb-4 text-blue-700">إضافة عامل جديد لشيت الحضور والراتب</h2>
+                <form id="addWorkerForm" onsubmit="addWorkerRow(event)" class="flex gap-4">
+                    <input type="text" id="newWorkerName" required placeholder="ادخل اسم العامل (مثلا: مريم، ملك...)" class="border p-2 rounded-lg flex-1">
+                    <input type="number" id="newWorkerRate" required placeholder="اليومية العادية (جنية)" class="border p-2 rounded-lg w-48">
+                    <button type="submit" class="bg-blue-700 text-white font-bold px-6 py-2 rounded-lg">إضافة العامل للشيت</button>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 overflow-x-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold">شيت الحضور والرواتب الأسبوعي (شامل اليوميات والوردية الليلية والسهرات)</h3>
+                    <button onclick="window.print()" class="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm no-print">طباعة كشف العمال</button>
+                </div>
+                <table class="w-full text-center border-collapse border border-gray-300">
+                    <thead>
+                        <tr class="bg-gray-200 border-b text-xs md:text-sm">
+                            <th class="p-2 border">اسم العامل</th>
+                            <th class="p-2 border">اليومية</th>
+                            <th class="p-2 border">السبت</th>
+                            <th class="p-2 border">الأحد</th>
+                            <th class="p-2 border">الإثنين</th>
+                            <th class="p-2 border">الثلاثاء</th>
+                            <th class="p-2 border">الأربعاء</th>
+                            <th class="p-2 border">الخميس</th>
+                            <th class="p-2 border">الجمعة</th>
+                            <th class="p-2 border bg-yellow-100 text-amber-800">حساب السهرات (150ج)</th>
+                            <th class="p-2 border text-red-600">السلف</th>
+                            <th class="p-2 border text-green-700 font-bold">الصافي المستحق</th>
+                            <th class="p-2 border no-print">حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="workersSheetBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 6. المصاريف -->
+        <div id="tab-expenses" class="tab-content hidden">
+            <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4 text-purple-700">تسجيل مصاريف المصنع</h2>
+                <form id="expForm" onsubmit="addExpense(event)" class="flex gap-4">
+                    <input type="text" id="expItem" required placeholder="بند المصروف (صيانة، نقل، كهرباء...)" class="border p-2 rounded-lg flex-1">
+                    <input type="number" step="0.01" id="expAmount" required placeholder="المبلغ" class="border p-2 rounded-lg w-40">
+                    <input type="date" id="expDate" required class="border p-2 rounded-lg">
+                    <button type="submit" class="bg-purple-700 text-white font-bold px-6 py-2 rounded-lg">حفظ المصروف</button>
+                </form>
+            </div>
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-bold mb-4">سجل المصاريف</h3>
+                <table class="w-full text-right border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 border-b">
+                            <th class="p-3">البند</th>
+                            <th class="p-3">المبلغ</th>
+                            <th class="p-3">التاريخ</th>
+                            <th class="p-3">حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelectorAll('input[type="date"]').forEach(i => i.value = today);
+            loadData();
+        });
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-red-700', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.remove('bg-gray-200', 'text-gray-700');
+            activeBtn.classList.add('bg-red-700', 'text-white');
+
+            if(tabId === 'buyer-statement') populateBuyerSelect();
+            if(tabId === 'seller-statement') populateSellerSelect();
+        }
+
+        function calcTotal(prefix) {
+            const w = parseFloat(document.getElementById(prefix + 'Weight').value) || 0;
+            const p = parseFloat(document.getElementById(prefix + 'Price').value) || 0;
+            const paid = parseFloat(document.getElementById(prefix + 'Paid').value) || 0;
+            const total = w * p;
+            document.getElementById(prefix + 'Total').value = total.toFixed(2);
+            document.getElementById(prefix + 'Remaining').value = (total - paid).toFixed(2);
+        }
+
+        function addTransaction(type, e) {
+            e.preventDefault();
+            const prefix = type === 'buyer' ? 'b' : 's';
+            const item = {
+                id: Date.now(),
+                name: document.getElementById(prefix + 'Name').value.trim(),
+                crop: document.getElementById(prefix + 'Crop').value,
+                weight: document.getElementById(prefix + 'Weight').value,
+                price: document.getElementById(prefix + 'Price').value,
+                total: document.getElementById(prefix + 'Total').value,
+                paid: document.getElementById(prefix + 'Paid').value,
+                remaining: document.getElementById(prefix + 'Remaining').value,
+                date: document.getElementById(prefix + 'Date').value
+            };
+            const list = getData(type + 's');
+            list.push(item);
+            saveData(type + 's', list);
+            document.getElementById(type + 'Form').reset();
+            loadData();
+        }
+
+        function payInstallment(type, e) {
+            e.preventDefault();
+            const isBuyer = type === 'buyer';
+            const nameSelect = document.getElementById(isBuyer ? 'payBuyerSelect' : 'paySellerSelect');
+            const amountInput = document.getElementById(isBuyer ? 'payBuyerAmount' : 'paySellerAmount');
+            const dateInput = document.getElementById(isBuyer ? 'payBuyerDate' : 'paySellerDate');
+
+            const name = nameSelect.value;
+            const paidVal = parseFloat(amountInput.value) || 0;
+
+            if(!name || paidVal <= 0) return;
+
+            const item = {
+                id: Date.now(),
+                name: name,
+                crop: 'تحصيل / سداد دفعة حساب',
+                weight: 0,
+                price: 0,
+                total: 0,
+                paid: paidVal,
+                remaining: -paidVal,
+                date: dateInput.value
+            };
+
+            const list = getData(type + 's');
+            list.push(item);
+            saveData(type + 's', list);
+            amountInput.value = '';
+            loadData();
+            alert('تم تسجيل الدفعة وخصمها من الحساب بنجاح!');
+        }
+
+        function loadData() {
+            renderTable('buyers', 'buyersTableBody');
+            renderTable('sellers', 'sellersTableBody');
+            populatePaySelects();
+            renderWorkersSheet();
+            renderExpenses();
+        }
+
+        function populatePaySelects() {
+            const buyers = [...new Set(getData('buyers').map(i => i.name))];
+            const bSelect = document.getElementById('payBuyerSelect');
+            bSelect.innerHTML = '<option value="">اختر المشتري...</option>';
+            buyers.forEach(n => bSelect.innerHTML += `<option value="${n}">${n}</option>`);
+
+            const sellers = [...new Set(getData('sellers').map(i => i.name))];
+            const sSelect = document.getElementById('paySellerSelect');
+            sSelect.innerHTML = '<option value="">اختر البائع...</option>';
+            sellers.forEach(n => sSelect.innerHTML += `<option value="${n}">${n}</option>`);
+        }
+
+        function renderTable(key, elementId) {
+            const list = getData(key);
+            const tbody = document.getElementById(elementId);
+            tbody.innerHTML = '';
+            list.forEach(i => {
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-3 font-bold">${i.name}</td>
+                        <td class="p-3">${i.crop}</td>
+                        <td class="p-3">${i.weight}</td>
+                        <td class="p-3">${i.price}</td>
+                        <td class="p-3 font-bold">${i.total} ج.م</td>
+                        <td class="p-3 text-green-600 font-bold">${i.paid} ج.م</td>
+                        <td class="p-3 text-red-600 font-bold">${i.remaining} ج.م</td>
+                        <td class="p-3">${i.date}</td>
+                        <td class="p-3"><button onclick="deleteItem('${key}', ${i.id})" class="text-red-600 font-bold">حذف</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function populateBuyerSelect() {
+            const list = getData('buyers');
+            const names = [...new Set(list.map(i => i.name))];
+            const select = document.getElementById('selectBuyer');
+            select.innerHTML = '<option value="">اختر المشتري...</option>';
+            names.forEach(n => select.innerHTML += `<option value="${n}">${n}</option>`);
+        }
+
+        function renderBuyerStatement() {
+            const name = document.getElementById('selectBuyer').value;
+            const area = document.getElementById('buyerStatementArea');
+            if(!name) { area.innerHTML = '<p class="text-gray-500 text-center py-4">يرجى اختيار المشتري.</p>'; return; }
+            const list = getData('buyers').filter(i => i.name === name);
+            let totalRem = list.reduce((acc, i) => acc + parseFloat(i.remaining), 0);
+            
+            let html = `<div class="p-4 border rounded-xl bg-gray-50 mb-4">
+                <h3 class="text-xl font-bold">كشف حساب المشتري: <span class="text-red-700">${name}</span></h3>
+                <p class="text-lg font-bold mt-2">إجمالي الدين المتبقي عليه حالياً: <span class="text-red-600">${totalRem.toFixed(2)} ج.م</span></p>
+            </div>
+            <table class="w-full text-right border">
+                <tr class="bg-gray-200"><th class="p-2 border">التاريخ</th><th class="p-2 border">المحصول / البيان</th><th class="p-2 border">الوزن</th><th class="p-2 border">السعر</th><th class="p-2 border">الإجمالي</th><th class="p-2 border">المدفوع</th><th class="p-2 border">المتبقي</th></tr>`;
+            list.forEach(i => {
+                html += `<tr><td class="p-2 border">${i.date}</td><td class="p-2 border">${i.crop}</td><td class="p-2 border">${i.weight}</td><td class="p-2 border">${i.price || 0}</td><td class="p-2 border">${i.total}</td><td class="p-2 border text-green-600 font-bold">${i.paid}</td><td class="p-2 border text-red-600 font-bold">${i.remaining}</td></tr>`;
+            });
+            html += `</table>`;
+            area.innerHTML = html;
+        }
+
+        function populateSellerSelect() {
+            const list = getData('sellers');
+            const names = [...new Set(list.map(i => i.name))];
+            const select = document.getElementById('selectSeller');
+            select.innerHTML = '<option value="">اختر البائع...</option>';
+            names.forEach(n => select.innerHTML += `<option value="${n}">${n}</option>`);
+        }
+
+        function renderSellerStatement() {
+            const name = document.getElementById('selectSeller').value;
+            const area = document.getElementById('sellerStatementArea');
+            if(!name) { area.innerHTML = '<p class="text-gray-500 text-center py-4">يرجى اختيار البائع.</p>'; return; }
+            const list = getData('sellers').filter(i => i.name === name);
+            let totalRem = list.reduce((acc, i) => acc + parseFloat(i.remaining), 0);
+            
+            let html = `<div class="p-4 border rounded-xl bg-gray-50 mb-4">
+                <h3 class="text-xl font-bold">كشف حساب البائع: <span class="text-green-700">${name}</span></h3>
+                <p class="text-lg font-bold mt-2">إجمالي المبلغ المتبقي له: <span class="text-green-600">${totalRem.toFixed(2)} ج.م</span></p>
+            </div>
+            <table class="w-full text-right border">
+                <tr class="bg-gray-200"><th class="p-2 border">التاريخ</th><th class="p-2 border">المحصول / البيان</th><th class="p-2 border">الوزن</th><th class="p-2 border">السعر</th><th class="p-2 border">الإجمالي</th><th class="p-2 border">المدفوع له</th><th class="p-2 border">المتبقي له</th></tr>`;
+            list.forEach(i => {
+                html += `<tr><td class="p-2 border">${i.date}</td><td class="p-2 border">${i.crop}</td><td class="p-2 border">${i.weight}</td><td class="p-2 border">${i.price || 0}</td><td class="p-2 border">${i.total}</td><td class="p-2 border text-green-600 font-bold">${i.paid}</td><td class="p-2 border text-green-600 font-bold">${i.remaining}</td></tr>`;
+            });
+            html += `</table>`;
+            area.innerHTML = html;
+        }
+
+        // شيت العمال والرواتب
+        function addWorkerRow(e) {
+            e.preventDefault();
+            const worker = {
+                id: Date.now(),
+                name: document.getElementById('newWorkerName').value.trim(),
+                rate: parseFloat(document.getElementById('newWorkerRate').value) || 0,
+                days: {sat:1, sun:1, mon:1, tue:1, wed:1, thu:1, fri:0},
+                advances: 0
+            };
+            const list = getData('workers');
+            list.push(worker);
+            saveData('workers', list);
+            document.getElementById('addWorkerForm').reset();
+            renderWorkersSheet();
+        }
+
+        function renderWorkersSheet() {
+            const list = getData('workers');
+            const tbody = document.getElementById('workersSheetBody');
+            tbody.innerHTML = '';
+            list.forEach((w, index) => {
+                let totalPay = 0;
+                let sahraPayTotal = 0;
+
+                Object.values(w.days).forEach(val => {
+                    if (val === 'night') {
+                        totalPay += 150; 
+                        sahraPayTotal += 150;
+                    } else if (val === 'sahra') {
+                        totalPay += (w.rate + 150); 
+                        sahraPayTotal += 150;
+                    } else {
+                        totalPay += (parseFloat(val) * w.rate);
+                    }
+                });
+                let net = totalPay - w.advances;
+
+                tbody.innerHTML += `
+                    <tr class="border-b">
+                        <td class="p-2 border font-bold">${w.name}</td>
+                        <td class="p-2 border">${w.rate}</td>
+                        ${['sat','sun','mon','tue','wed','thu','fri'].map(day => `
+                            <td class="p-1 border">
+                                <select onchange="updateWorkerDay(${index}, '${day}', this.value)" class="p-1 border rounded text-xs font-semibold">
+                                    <option value="1" ${w.days[day] == 1 ? 'selected' : ''}>حاضر (صباحي)</option>
+                                    <option value="sahra" ${w.days[day] == 'sahra' ? 'selected' : ''}>🌟 سهرة (يوم + 150ج ليل)</option>
+                                    <option value="night" ${w.days[day] == 'night' ? 'selected' : ''}>🌙 وردية ليل فقط (150ج)</option>
+                                    <option value="0.5" ${w.days[day] == 0.5 ? 'selected' : ''}>نصف يوم</option>
+                                    <option value="0" ${w.days[day] == 0 ? 'selected' : ''}>غائب</option>
+                                </select>
+                            </td>
+                        `).join('')}
+                        <td class="p-2 border bg-yellow-50 text-amber-800 font-bold">${sahraPayTotal} ج.م</td>
+                        <td class="p-2 border"><input type="number" value="${w.advances}" onchange="updateWorkerAdvance(${index}, this.value)" class="w-16 border text-center text-red-600 font-bold p-1"></td>
+                        <td class="p-2 border font-bold text-green-700">${net.toFixed(2)} ج.م</td>
+                        <td class="p-2 border no-print"><button onclick="deleteItem('workers', ${w.id})" class="text-red-600 font-bold">X</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updateWorkerDay(index, day, val) {
+            let list = getData('workers');
+            list[index].days[day] = (val === 'night' || val === 'sahra') ? val : parseFloat(val);
+            saveData('workers', list);
+            renderWorkersSheet();
+        }
+
+        function updateWorkerAdvance(index, val) {
+            let list = getData('workers');
+            list[index].advances = parseFloat(val) || 0;
+            saveData('workers', list);
+            renderWorkersSheet();
+        }
+
+        function addExpense(e) {
+            e.preventDefault();
+            const exp = {
+                id: Date.now(),
+                item: document.getElementById('expItem').value,
+                amount: document.getElementById('expAmount').value,
+                date: document.getElementById('expDate').value
+            };
+            const list = getData('expenses');
+            list.push(exp);
+            saveData('expenses', list);
+            document.getElementById('expForm').reset();
+            renderExpenses();
+        }
+
+        function renderExpenses() {
+            const list = getData('expenses');
+            const tbody = document.getElementById('expTableBody');
+            tbody.innerHTML = '';
+            list.forEach(i => {
+                tbody.innerHTML += `
+                    <tr class="border-b">
+                        <td class="p-3">${i.item}</td>
+                        <td class="p-3 font-bold text-red-600">${i.amount} ج.م</td>
+                        <td class="p-3">${i.date}</td>
+                        <td class="p-3"><button onclick="deleteItem('expenses', ${i.id})" class="text-red-600 font-bold">حذف</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function saveData(key, list) { localStorage.setItem('goodland_' + key, JSON.stringify(list)); }
+        function getData(key) { return JSON.parse(localStorage.getItem('goodland_' + key) || '[]'); }
+        function deleteItem(key, id) {
+            if(confirm('هل أنت متأكد من الحذف؟')) {
+                let list = getData(key).filter(i => i.id !== id);
+                saveData(key, list);
+                loadData();
+            }
+        }
+    </script>
+</body>
+</html>
